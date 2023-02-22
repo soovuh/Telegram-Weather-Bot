@@ -1,7 +1,14 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-b1 = InlineKeyboardButton(text = 'Установить мой город', callback_data='/register')
+# This is creating client inline keyboard
+
+b1 = InlineKeyboardButton(text='Інформація', callback_data='/info')
+b2 = InlineKeyboardButton(text='Встановити моє місто',
+                          callback_data='/register')
+b3 = InlineKeyboardButton(
+    text='Погода зараз', callback_data='/weather_in_my_city_now')
+
 
 client_kb = InlineKeyboardMarkup(row_width=2)
 
-client_kb.add(b1)
+client_kb.row(b1, b2).row(b3)
