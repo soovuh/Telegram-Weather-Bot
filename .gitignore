@@ -1,5 +1,7 @@
 media
 venv
 TODO
-bot_run.bat
+run.bat
 __pycache__
+config.py
+weather_db.db

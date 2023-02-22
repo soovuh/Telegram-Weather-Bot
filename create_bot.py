@@ -1,8 +1,6 @@
-'''
-create bot and dispatcher
-also configurate memory storage 
-and use TOKEN from config file
-'''
+# create bot and dispatcher
+# also configurate memory storage 
+# and use TOKEN from config file
 
 from aiogram import Bot
 from aiogram.dispatcher import Dispatcher
