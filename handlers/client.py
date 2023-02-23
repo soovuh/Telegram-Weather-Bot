@@ -32,9 +32,10 @@ async def see_weather_now(callback: types.CallbackQuery):
     city = await sqlite_db.sql_get_city(callback.from_user.id)
     if city != None:
         lat, lon = await weather_search.get_cords(city)
-    weather_info = await weather_search.get_weather(lat, lon, city)
+    weather_info, icon_path = await weather_search.get_weather(lat, lon, city)
     translated_weather_info = await weather_search.translate_to_ua(weather_info)
-    await bot.send_message(callback.from_user.id, translated_weather_info, reply_markup=client_kb)
+    with open(icon_path, 'rb') as icon:
+        await bot.send_photo(callback.from_user.id, photo=icon,  caption=translated_weather_info, reply_markup=client_kb)
 
 
 # registration handlers

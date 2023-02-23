@@ -1,7 +1,8 @@
 import requests
+import time
 from translate import Translator
 from config import api_key_cords, api_key_weather
-
+from photo_config import photo_dict
 
 # function for getting cords of city
 async def get_cords(city):
@@ -29,10 +30,14 @@ async def get_weather(lat, lon, city):
         data = response.json()
         temperature = data['main']['temp']
         description = data['weather'][0]['description']
+        main_description = data['weather'][0]['main']
+
+        main_description = 'Rain'
+        icon_path = photo_dict[main_description.lower()]
 
         # Format weather information as ordered string
         weather_str = f'Weather for {city}: {description}, temperature is {(temperature - 273.15):.1f}°C'
-        return weather_str
+        return weather_str, icon_path
     else:
         # Handle API error
         error_str = f'Error retrieving weather information.'
@@ -42,5 +47,9 @@ async def get_weather(lat, lon, city):
 # function to translate english string to ukrainian
 async def translate_to_ua(text):
     translator = Translator(to_lang="uk")
+    time.sleep(0.3)
     translation = translator.translate(text)
+    time.sleep(0.3)
     return translation
+
+
