@@ -20,7 +20,7 @@ def sql_start():
 # adding city and user_id in database or updating info about city if user_id already exists in table
 async def sql_add_command(state, ID):
     async with state.proxy() as data:
-        if data.get('lat'):
+        if data.get('lat') and data.get('lon'):
             lat, lon = data.get('lat'), data.get('lon')
             city = await weather_search.get_city(lat, lon)
             if city:
@@ -80,6 +80,7 @@ async def sql_add_command(state, ID):
                     base.commit()
             else:
                 await bot.send_message(ID, 'Сталася помилка, спробуйте ще раз, або трохи пізніше', reply_markup=client_kb)
+
 
 # get coords from user_id
 async def sql_get_coords(ID):
