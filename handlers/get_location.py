@@ -2,8 +2,9 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
 from create_bot import bot
-from inline_buttons import cancel_kb_2, client_kb, choose_kb
+from inline_buttons import cancel_kb_2, client_kb
 from data_base import sqlite_db
+import time
 
 class FSMRegistrationLocation(StatesGroup):
     location = State()
@@ -32,10 +33,12 @@ async def cancel_handler_2(callback: types.CallbackQuery, state: FSMContext):
 
 # loading city and user_id, after call sqlite_db function to save result and finish state
 async def load_location(message: types.Message, state: FSMContext):
-    print('alo')
+    await bot.send_message(message.from_user.id, 'Зберігаємо дані...', reply_markup=types.ReplyKeyboardRemove())
+    time.sleep(1)
     async with state.proxy() as data:
-        data['location'] = message.location
-    print(data['location'])
+        data['lat'] = message.location.latitude
+        data['lon'] = message.location.longitude
+    await sqlite_db.sql_add_command(state, message.from_user.id)
     await bot.send_message(message.from_user.id, 'Готово', reply_markup=client_kb)
     await state.finish()
 
@@ -45,4 +48,4 @@ def register_handlers_get_location(dp: Dispatcher):
     dp.register_callback_query_handler(cm_start_loc, text='/register_loc', state=None)
     dp.register_callback_query_handler(
         cancel_handler_2, state="*", text='/rollback2')
-    dp.register_message_handler(load_location, state=FSMRegistrationLocation.location)
+    dp.register_message_handler(load_location, content_types=['location'], state=FSMRegistrationLocation.location)

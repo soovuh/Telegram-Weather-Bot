@@ -14,8 +14,20 @@ async def get_cords(city):
         lon = response["results"][0]["geometry"]["lng"]
         return lat, lon
     else:
-        return None
+        return None, None
 
+async def get_city(lat, lon):
+    url = f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key_weather}'
+
+    response = requests.get(url)
+    response.raise_for_status()
+    if response.status_code == 200:
+        # Extract relevant data from API response
+        data = response.json()
+        city = data['name']
+        return city
+    else:
+        return None
 
 # function for getting weather in string format
 async def get_weather(lat, lon, city):
@@ -32,13 +44,14 @@ async def get_weather(lat, lon, city):
         weather_icon = data['weather'][0]['icon']
         url_icon = f'http://openweathermap.org/img/w/{weather_icon}.png'
         
-        # Format weather information as ordered string
-        weather_str = f'Weather for {city}: \n{description.capitalize()}\nTemperature is {(temperature - 273.15):.1f}°C'
+        
+        description = await translate_to_ua(description)
+        weather_str = f'{city.capitalize()}.\n{description.capitalize()} {(temperature - 273.15):.1f}°C.'
         return weather_str, url_icon
     else:
         # Handle API error
-        error_str = f'Error retrieving weather information.'
-        return error_str
+        error_str = f'Упс, щось пішло не так... Перевірте, чи корректно ви зареєстрували місце для отримання погоди або спробуйте трохи пізніше'
+        return error_str, 'https://cdn0.iconfinder.com/data/icons/shift-interfaces/32/Error-512.png'
 
 
 # function to translate english string to ukrainian
@@ -47,6 +60,9 @@ async def translate_to_ua(text):
     time.sleep(0.3)
     translation = translator.translate(text)
     time.sleep(0.3)
-    return translation
+    if translation:
+        return translation
+    else:
+        return 'Сталася помилка, спробуйте переєструвати місце, чи повотріть спробу трохи пізніше'
 
 

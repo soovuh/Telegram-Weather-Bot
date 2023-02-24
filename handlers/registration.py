@@ -27,9 +27,11 @@ async def cm_start(callback: types.CallbackQuery):
 async def cancel_handler(callback: types.CallbackQuery, state: FSMContext):
     current_state = await state.get_state()
     if current_state is None:
+        await callback.answer('Відмніа')
+        await bot.send_message(callback.from_user.id, 'Повертаємося до головного меню...', reply_markup=client_kb)
         return
     await state.finish()
-    await bot.send_message(callback.from_user.id, 'Відкат', reply_markup=client_kb)
+    await bot.send_message(callback.from_user.id, 'Повертаємося до головного меню...', reply_markup=client_kb)
     await callback.answer('Відміна')
 
 
