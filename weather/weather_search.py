@@ -1,6 +1,6 @@
 import requests
 import time
-from translate import Translator
+from mtranslate import translate
 from config import api_key_cords, api_key_weather
 
 # function for getting cords of city
@@ -44,9 +44,11 @@ async def get_weather(lat, lon, city):
         weather_icon = data['weather'][0]['icon']
         url_icon = f'http://openweathermap.org/img/w/{weather_icon}.png'
         
-        
-        description = await translate_to_ua(description)
-        weather_str = f'{city.capitalize()}.\n{description.capitalize()} {(temperature - 273.15):.1f}°C.'
+        print(description)
+        translate_description = await translate_to_ua(description)
+        time.sleep(0.2)
+        weather_str = f'{city.capitalize()}.\n{translate_description.capitalize()},  {(temperature - 273.15):.1f}°C.'
+        weather_str.replace('weather condition', '')
         return weather_str, url_icon
     else:
         # Handle API error
@@ -56,9 +58,8 @@ async def get_weather(lat, lon, city):
 
 # function to translate english string to ukrainian
 async def translate_to_ua(text):
-    translator = Translator(to_lang="uk")
     time.sleep(0.3)
-    translation = translator.translate(text)
+    translation = translate(text, 'uk')
     time.sleep(0.3)
     if translation:
         return translation

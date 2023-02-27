@@ -13,7 +13,7 @@ def sql_start():
         print('Data base connected OK!')
     base.execute('''
                 CREATE TABLE IF NOT EXISTS
-                users(user_id, city_name, lat, lon)
+                users(user_id, city_name, lat, lon, alert_time, just_for)
                  ''')
     base.commit()
 
@@ -43,9 +43,9 @@ async def sql_add_command(state, ID):
                     base.commit()
                 else:
                     cur.execute('''
-                                INSERT INTO users(lat, lon, city_name, user_id)
-                                VALUES(?, ?, ?, ?)
-                                ''', (lat, lon, city, ID))
+                                INSERT INTO users(lat, lon, city_name, user_id, just_for)
+                                VALUES(?, ?, ?, ?, ?, ?)
+                                ''', (lat, lon, city, ID, 'morning', True))
                     base.commit()
             else:
                 await bot.send_message(ID, 'Сталася помилка, спробуйте ще раз або трохи пізніше', reply_markup=client_kb)
@@ -74,9 +74,9 @@ async def sql_add_command(state, ID):
                     base.commit()
                 else:
                     cur.execute('''
-                                INSERT INTO users(city_name, user_id, lat, lon)
-                                VALUES(?, ?, ?, ?)
-                                ''', (city, ID, lat, lon))
+                                INSERT INTO users(city_name, user_id, lat, lon, alert_time, just_for)
+                                VALUES(?, ?, ?, ?, ?, ?)
+                                ''', (city, ID, lat, lon, 'morning', True))
                     base.commit()
             else:
                 await bot.send_message(ID, 'Сталася помилка, спробуйте ще раз, або трохи пізніше', reply_markup=client_kb)
@@ -100,3 +100,41 @@ async def check_user(ID):
     check = cur.execute(f'SELECT user_id FROM users WHERE user_id = {ID}').fetchone()
     return True if check else False
     
+
+async def add_alert_time(ID, alert_time):
+    check = await check_user(ID)
+    if check:
+        cur.execute(f'''
+                    UPDATE users
+                    SET alert_time = ?
+                    WHERE user_id = ?
+                    ''', (alert_time, ID))
+        base.commit()
+        return True
+    else:
+        return False
+
+async def delete_alert(ID):
+    check = await check_user(ID)
+    if check:
+        cur.execute(f'''
+                    UPDATE users
+                    SET alert_time = ?
+                    WHERE user_id = ?
+                    ''', ('None', ID))
+        base.commit()
+        return True
+    else:
+        return False 
+
+async def get_users_to_alert(alert_time):
+    users_list = cur.execute(f'''
+                        SELECT user_id
+                        FROM users
+                        WHERE alert_time = ? AND just_for = ?
+                        ''', (alert_time, True)).fetchall()
+    users = []
+    for user in users_list:
+        users.append(user[0])
+    print(users)
+    return users
