@@ -13,7 +13,7 @@ def sql_start():
         print('Data base connected OK!')
     base.execute('''
                 CREATE TABLE IF NOT EXISTS
-                users(user_id, city_name, lat, lon, alert_time, just_for)
+                users(user_id, city_name, lat, lon, alert_time, just_for, send_joke DEFAULT true)
                  ''')
     base.commit()
 
@@ -136,5 +136,30 @@ async def get_users_to_alert(alert_time):
     users = []
     for user in users_list:
         users.append(user[0])
+    return users
+
+async def get_users_to_send_joke(alert_time):
+    users_list = cur.execute(f'''
+                            SELECT user_id
+                            FROM users
+                            WHERE alert_time = ? AND send_joke = ?
+                            ''', (alert_time, True))
+    users = []
+    for user in users_list:
+        users.append(user[0])
     print(users)
     return users
+
+
+async def send_joke_status(ID, status):
+    check = await check_user(ID)
+    if check:
+        cur.execute(f'''
+                    UPDATE users
+                    SET send_joke = ?
+                    WHERE user_id = ?
+                    ''', (status, ID))
+        base.commit()
+        return True
+    else:
+        return False
