@@ -8,7 +8,8 @@ b2 = InlineKeyboardButton(text='Встановити місцезнаходже�
 b4 = InlineKeyboardButton(
     text='Погода зараз', callback_data='/weather_in_my_city_now')
 
-b3 = InlineKeyboardButton(text='Налаштування оповіщення', callback_data='/set_alert_time')
+b3 = InlineKeyboardButton(text='Налаштування оповіщення',
+                          callback_data='/set_alert_time')
 b5 = InlineKeyboardButton(text='Анекдот', callback_data='/joke')
 
 

@@ -1,6 +1,7 @@
 import bs4
 import requests
 
+
 async def joke_search():
     url = 'https://www.anekdotua.com'
     response = requests.get(url)
@@ -23,4 +24,3 @@ async def joke_search():
                 break
             joke_text += i
         return joke_text
-

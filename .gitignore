@@ -1,8 +1,4 @@
-media
 venv
-TODO
-run.bat
 __pycache__
 config.py
-weather_db.db
 Telegram-Weather-Bot.code-workspace

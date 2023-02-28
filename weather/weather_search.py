@@ -4,6 +4,8 @@ from mtranslate import translate
 from config import api_key_cords, api_key_weather
 
 # function for getting cords of city
+
+
 async def get_cords(city):
     # Replace with your OpenCage Geocoder API key
     url = f"https://api.opencagedata.com/geocode/v1/json?q={city}&key={api_key_cords}"
@@ -15,6 +17,7 @@ async def get_cords(city):
         return lat, lon
     else:
         return None, None
+
 
 async def get_city(lat, lon):
     url = f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key_weather}'
@@ -30,6 +33,8 @@ async def get_city(lat, lon):
         return None
 
 # function for getting weather in string format
+
+
 async def get_weather(lat, lon, city):
     # Replace with your actual API key from OpenWeatherMap
     url = f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key_weather}'
@@ -43,8 +48,7 @@ async def get_weather(lat, lon, city):
         description = data['weather'][0]['description']
         weather_icon = data['weather'][0]['icon']
         url_icon = f'http://openweathermap.org/img/w/{weather_icon}.png'
-        
-        print(description)
+
         translate_description = await translate_to_ua(description)
         time.sleep(0.2)
         weather_str = f'{city.capitalize()}.\n{translate_description.capitalize()},  {(temperature - 273.15):.1f}°C.'
@@ -65,5 +69,3 @@ async def translate_to_ua(text):
         return translation
     else:
         return 'Сталася помилка, спробуйте переєструвати місце, чи повотріть спробу трохи пізніше'
-
-
