@@ -5,6 +5,8 @@ from create_bot import bot
 from inline_buttons import client_kb
 
 # function for connect to database, and create table users if not exist
+
+
 def sql_start():
     global base, cur
     base = sq.connect('weather_db.db')
@@ -18,6 +20,8 @@ def sql_start():
     base.commit()
 
 # adding city and user_id in database or updating info about city if user_id already exists in table
+
+
 async def sql_add_command(state, ID):
     async with state.proxy() as data:
         if data.get('lat') and data.get('lon'):
@@ -49,7 +53,7 @@ async def sql_add_command(state, ID):
                     base.commit()
             else:
                 await bot.send_message(ID, 'Сталася помилка, спробуйте ще раз або трохи пізніше', reply_markup=client_kb)
-                
+
         elif data.get('city'):
             city = data.get('city')
             city = await weather_search.translate_to_ua(city)
@@ -89,6 +93,7 @@ async def sql_get_coords(ID):
                         ''').fetchone()
     return cords
 
+
 async def sql_get_city(ID):
     city = cur.execute(f'''
                         SELECT city_name FROM users WHERE user_id = {ID}
@@ -96,10 +101,12 @@ async def sql_get_city(ID):
 
     return city
 
+
 async def check_user(ID):
-    check = cur.execute(f'SELECT user_id FROM users WHERE user_id = {ID}').fetchone()
+    check = cur.execute(
+        f'SELECT user_id FROM users WHERE user_id = {ID}').fetchone()
     return True if check else False
-    
+
 
 async def add_alert_time(ID, alert_time):
     check = await check_user(ID)
@@ -114,6 +121,7 @@ async def add_alert_time(ID, alert_time):
     else:
         return False
 
+
 async def delete_alert(ID):
     check = await check_user(ID)
     if check:
@@ -125,7 +133,8 @@ async def delete_alert(ID):
         base.commit()
         return True
     else:
-        return False 
+        return False
+
 
 async def get_users_to_alert(alert_time):
     users_list = cur.execute(f'''
@@ -138,6 +147,7 @@ async def get_users_to_alert(alert_time):
         users.append(user[0])
     return users
 
+
 async def get_users_to_send_joke(alert_time):
     users_list = cur.execute(f'''
                             SELECT user_id
@@ -147,7 +157,6 @@ async def get_users_to_send_joke(alert_time):
     users = []
     for user in users_list:
         users.append(user[0])
-    print(users)
     return users
 
 

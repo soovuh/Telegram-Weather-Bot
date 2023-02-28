@@ -3,8 +3,9 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram import types, Dispatcher
 from create_bot import bot
 from inline_buttons import cancel_kb, client_kb, choose_kb
-from data_base import sqlite_db
+from data_base import postgres_db
 import time
+
 
 async def choose(callback: types.CallbackQuery):
     await callback.answer('Виберіть варіант')
@@ -16,7 +17,7 @@ class FSMRegistrationCity(StatesGroup):
     city = State()
 
 
-# start 
+# start
 async def cm_start(callback: types.CallbackQuery):
     await FSMRegistrationCity.city.set()
     await bot.send_message(callback.from_user.id, 'Напишіть своє місто', reply_markup=cancel_kb)
@@ -41,7 +42,7 @@ async def load_city(message: types.Message, state: FSMContext):
         data['city'] = message.text
         data['user_id'] = message.from_user.id
 
-    await sqlite_db.sql_add_command(state, message.from_user.id)
+    await postgres_db.sql_add_command(state, message.from_user.id)
     await bot.send_message(message.from_user.id, 'Готово', reply_markup=client_kb)
     await state.finish()
 
@@ -49,7 +50,8 @@ async def load_city(message: types.Message, state: FSMContext):
 # registration handlers
 def register_handlers_registration(dp: Dispatcher):
     dp.register_callback_query_handler(choose, text='/register')
-    dp.register_callback_query_handler(cm_start, text='/register_city', state=None)
+    dp.register_callback_query_handler(
+        cm_start, text='/register_city', state=None)
     dp.register_callback_query_handler(
         cancel_handler, state="*", text='/rollback')
     dp.register_message_handler(load_city, state=FSMRegistrationCity.city)
